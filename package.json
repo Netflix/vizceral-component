@@ -27,7 +27,7 @@
   "dependencies": {
     "lodash": "^4.11.1",
     "style-loader": "^0.13.1",
-    "vizceral": "git+ssh://git@github.com:Netflix/vizceral.git#v1.0.4"
+    "vizceral": "git+ssh://git@github.com:Netflix/vizceral.git#v1.0.5"
   },
   "repository": {
     "type": "git",
