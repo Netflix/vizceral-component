@@ -123,8 +123,12 @@ class VizceralComponent {
       // Update styles based on any passed in custom styles
       const styleNames = this._vizceral.getStyles();
       const customStyles = styleNames.reduce((result, styleName) => {
-        const passedInStyle = this.getComputedStyleValue(`--${styleName}`).trim();
+        let passedInStyle = this.getComputedStyleValue(`--${styleName}`).trim();
         if (passedInStyle) {
+          // HACK Remove strange \3 and space from some hex codes
+          if (passedInStyle.match(/^#\\3\d \d{5}$/)) {
+            passedInStyle = passedInStyle.replace(/(\\3| )/g, '');
+          }
           result[styleName] = passedInStyle;
         }
         return result;
