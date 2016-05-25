@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html {
+        background: rgb(45, 45, 45);
+        color: rgb(214, 214, 214);
+      }
+      a {
+        color: rgb(186, 213, 237)
+      }
+      a:hover {
+        color: rgb(214, 214, 214);
+      }
+      a:visited, a:active {
+        color: rgb(129, 129, 129);
+      }
+      .vizceral-component {
+        --colorText: rgb(214, 214, 214);
+        --colorTextDisabled: rgb(129, 129, 129);
+        --colorNormal: rgb(186, 213, 237);
+        --colorWarning: rgb(268, 185, 73);
+        --colorDanger: rgb(184, 36, 36);
+        --colorNormalDimmed: rgb(101, 117, 128);
+        --colorBackgroundDark: rgb(35, 35, 35);
+        --colorNormalDonut: rgb(91, 91, 91);
+        --colorLabelBorder: rgb(16, 17, 18);
+        --colorLabelText: rgb(0, 0, 0);
+        --colorDonutInternalColor: rgb(35, 35, 35);
+        --colorDonutInternalColorHighlighted: rgb(255, 255, 255);
+        --colorConnectionLine: rgb(91, 91, 91);
+        --colorPageBackground: rgb(45, 45, 45);
+        --colorPageBackgroundTransparent: rgba(45, 45, 45, 0);
+        --colorBorderLines: rgb(137, 137, 137);
+      }
+    </style>
+      <meta charset="utf-8">
+      <title>vizceral-component</title>
+
+      <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+      <link rel="import" href="vizceral-component.html">
+  </head>
+  <body style="width:100%; height:100%;">
+
+    <h1>vizceral-component</h1>
+
+    <p>(<a href="ELEMENT.md">docs</a>)<br/>
+    <p>Double click on a node to zoom into the node, hit ESC to zoom back out</p>
+
+    <vizceral-component id="vizceral-component" class="vizceral-component" regions="us-west-2,us-east-1,eu-west-1" style="width:100%; height:800px;" ></vizceral-component>
+
+    <script>
+      window.onkeyup = function(e) {
+        var key = e.keyCode ? e.keyCode : e.which;
+
+        if (key === 27) {
+          var flow = document.getElementById('vizceral-component');
+          flow.zoomOutViewLevel();
+        }
+      }
+
+      function loadJSON(file, callback) {
+
+        var xobj = new XMLHttpRequest();
+        xobj.responseType = "json";
+        xobj.open('GET', file, true);
+        xobj.onreadystatechange = function () {
+          if (xobj.readyState === 4 && xobj.status === 200) {
+            callback(xobj.response);
+          }
+        };
+        xobj.send(null);
+     }
+      window.addEventListener('WebComponentsReady', function() {
+        loadJSON('sample_data.json', function (response) {
+          var flow = document.getElementById('vizceral-component');
+          flow.updateData(response);
+        });
+      }, false);
+    </script>
+  </body>
+</html>

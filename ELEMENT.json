@@ -1,0 +1,140 @@
+{
+  "filename": "src/vizceral-component.js",
+  "is": "vizceral-component",
+  "es6ClassName": "VizceralComponent",
+  "behaviors": {},
+  "properties": {
+    "regions": {
+      "type": "String",
+      "value": "",
+      "observer": "_regionsChanged",
+      "reflectToAttribute": true,
+      "loc": 69,
+      "comments": "`regions` Which regions to pre-load in a csv"
+    },
+    "showLabels": {
+      "type": "Boolean",
+      "value": true,
+      "observer": "_showLabelsChanged",
+      "loc": 79,
+      "comments": "`show-labels` Whether to show node labels or not"
+    },
+    "view": {
+      "type": "Array",
+      "observer": "setView",
+      "reflectToAttribute": true,
+      "loc": 92,
+      "comments": "`view` Selected view (global, region, node)\nExamples:\n[] - global view\n[\"us-west-2\"] - region view for us-west-2\n['us-west-2', 'api-prod'] - node view for api-prod in us-west-2"
+    }
+  },
+  "events": {
+    "vizceral-node-highlighted": {
+      "comments": "The `vizceral-node-highlighted` event is fired whenever a node is highlighted.\n\n@event vizceral-node-highlighted\n@property {object} node - The node object that has been highlighted/selected.",
+      "firedLoc": [
+        140
+      ]
+    },
+    "vizceral-rendered": {
+      "comments": "The `vizceral-rendered` event is fired whenever a graph is rendered.\n\n@event vizceral-rendered\n@property {string} name - the name of the graph that was rendered\n@property (boolean} rendered - true only if the graph has been rendered AND has position data",
+      "firedLoc": [
+        144
+      ]
+    },
+    "vizceral-view-changed": {
+      "comments": "The `vizceral-view-changed` event is fired whenever the view changes between global, regional, and node\n\n@event vizceral-view-changed\n@property {array} view - The currently selected view (e.g. [] for global, ['us-east-1'] for regional, ['us-east-1', 'api'] for node level)",
+      "firedLoc": [
+        136
+      ]
+    },
+    "vizceral-node-updated": {
+      "comments": "The `vizceral-node-updated` event is fired whenever a node that is highlighted or selected is updated.\n\n@event vizceral-node-updated\n@property {object} node - The node object that has been highlighted/selected.",
+      "firedLoc": [
+        148
+      ]
+    },
+    "vizceral-region-context-size-changed": {
+      "comments": "The `vizceral-region-context-size-changed` event is fired whenever the size of a region context panel is changed\n\n@event vizceral-region-context-size-changed\n@property {object} dimensions - The dimensions of the regional context panel in which to inject context",
+      "firedLoc": [
+        152
+      ]
+    },
+    "attached": {
+      "comments": "The `attached` event is fired when the element is attached to the DOM.\n\n@event attached",
+      "firedLoc": [
+        164
+      ]
+    }
+  },
+  "methods": {
+    "ready": {
+      "name": "ready",
+      "comments": "`ready` is called after all elements have been configured, but\npropagates bottom-up. This element's children are ready, but parents\nare not.\n\nThis is the point where you should make modifications to the DOM (when\nnecessary), or kick off any processes the element wants to perform.",
+      "loc": 102
+    },
+    "attached": {
+      "name": "attached",
+      "comments": "`attached` fires once the element and its parents have been inserted\ninto a document.\n\nThis is a good place to perform any work related to your element's\nvisual state or active behavior (measuring sizes, beginning animations,\nloading resources, etc).",
+      "loc": 111
+    },
+    "detached": {
+      "name": "detached",
+      "comments": "The analog to `attached`, `detached` fires when the element has been\nremoved from a document.\n\nUse this to clean up anything you did in `attached`.\nThe analog to `attached`, `detached` fires when the element has been\nremoved from a document.\n\nUse this to clean up anything you did in `attached`.",
+      "loc": 167
+    },
+    "zoomOutViewLevel": {
+      "name": "zoomOutViewLevel",
+      "comments": "If zoomed into a region or a service, zoom out one level up.\nIf in the global view, this is a noop.",
+      "loc": 178
+    },
+    "setView": {
+      "name": "setView",
+      "comments": "Set the current view of the component to the passed in array. If the passed\nin array does not match an existing region or node, the component will try\neach level up the array until it finds a match, defaulting to the global\nview.\n\nEx:\n[] - show the base global view\n['us-east-1'] - show the regional view for 'us-east-1' if it exists\n['us-east-1', 'api'] - show the api node in the us-east-1 region if it exists\n\n@param {array} viewArray - the array containing the view to set.",
+      "loc": 195
+    },
+    "clearHighlight": {
+      "name": "clearHighlight",
+      "comments": "Clears the highlighted node, if there is one.  If a node is not highlighted,\nthis is a noop.",
+      "loc": 205
+    },
+    "findNodes": {
+      "name": "findNodes",
+      "comments": "Highlight nodes that match searchString.  Searches the node name and the list\nof clusters, if nodes have one.\n\n@param {string} searchString - The string to match against the nodes.",
+      "loc": 215
+    },
+    "updateData": {
+      "name": "updateData",
+      "comments": "Set the new set of traffic data to render. This is expected to be called\nwith the complete set of traffic data anytime there is an update.\n\n@param {object} data - The traffic data that matches the format in DATAFORMATS.md\n@param {array} excludedEdgeNodes - An array of node names that are at the edge that you want excluded from the global totals",
+      "loc": 226
+    },
+    "setFilters": {
+      "name": "setFilters",
+      "comments": "Set the set of filters to apply along with their current values.\n\n@param {object} filters - The filters that match the format in DATAFORMATS.md",
+      "loc": 236
+    },
+    "getNode": {
+      "name": "getNode",
+      "comments": "Get a specific node object\n\n@param {array} nodeArray - e.g. [ region, nodeName ]",
+      "loc": 245
+    },
+    "getCurrentGraph": {
+      "name": "getCurrentGraph",
+      "comments": "Get the currently selected graph object",
+      "loc": 252
+    },
+    "getGraphs": {
+      "name": "getGraphs",
+      "comments": "Get all the graphs, global and regional",
+      "loc": 259
+    },
+    "_regionsChanged": {
+      "name": "_regionsChanged",
+      "comments": "fires when @regions is changed",
+      "loc": 268
+    },
+    "_showLabelsChanged": {
+      "name": "_showLabelsChanged",
+      "comments": "fires when @show-labels is changed",
+      "loc": 278
+    }
+  }
+}

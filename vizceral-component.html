@@ -1,0 +1,64 @@
+
+<!--
+@license
+Copyright (c) 2015 Netflix
+
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+An element providing a solution to no problem in particular.
+Example:
+    <vizcercal-component foo="bar"></vizcercal-component>
+@group Reboot
+@element vizcercal-component
+@demo index.html
+-->
+
+<dom-module id="vizceral-component">
+  <template>
+    <style>
+        :host {
+          display: block;
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+        }
+
+        .connection-notice {
+          display: block;
+          position: absolute;
+          padding: 0 3px;
+          width: 200px;
+
+          background-color: black;
+          border-left: 2px solid grey;
+
+          font-size: 11px;
+          color: grey;
+        }
+
+        .connection-notice ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .connection-notice > ul > li {
+          line-height: 12px;
+          padding-top: 3px;
+          padding-bottom: 3px;
+        }
+
+        .connection-notice .subtitle {
+          font-weight: 900;
+        }
+    </style>
+    <div class="connection-notice"><ul></ul></div>
+  </template>
+</dom-module>
+
+<!-- javascript for module -->
+<script type="text/javascript" src="vizceral-component.js"></script>
+<script type="text/javascript" class="rbt-version">window.RBT_VERSIONS = window.RBT_VERSIONS||{}; window.RBT_VERSIONS['vizceral-component']='2.11.4';</script>

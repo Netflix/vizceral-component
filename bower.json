@@ -1,0 +1,29 @@
+{
+  "name": "vizceral-component",
+  "version": "2.11.4",
+  "authors": [],
+  "main": "vizceral-component.html",
+  "keywords": [
+    "motion",
+    "web-components",
+    "traffic",
+    "graph",
+    "network",
+    "particles"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#~3.3.30",
+    "test-fixture": "polymerelements/test-fixture#^1.0.0"
+  }
+}
