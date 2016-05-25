@@ -1,6 +1,6 @@
 {
   "name": "vizceral-component",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "pretest": "hash wct 2>/dev/null || { echo >&2 \"There are no tests, maybe we should write some.\"; exit 1; }",
     "bower": "bower update && bower install",

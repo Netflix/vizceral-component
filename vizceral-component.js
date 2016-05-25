@@ -195,7 +195,7 @@
 	          var passedInStyle = _this.getComputedStyleValue('--' + styleName).trim();
 	          if (passedInStyle) {
 	            // HACK Remove strange \3 and space from some hex codes
-	            if (passedInStyle.match(/^#\\3\d \d{5}$/)) {
+	            if (passedInStyle.match(/^#\\3\d /)) {
 	              passedInStyle = passedInStyle.replace(/(\\3| )/g, '');
 	            }
 	            result[styleName] = passedInStyle;
