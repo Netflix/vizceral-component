@@ -41,16 +41,22 @@ class VizceralComponent {
   * @property {array} view - The currently selected view (e.g. [] for global, ['us-east-1'] for regional, ['us-east-1', 'api'] for node level)
   */
   /**
-  * The `vizceral-node-updated` event is fired whenever a node that is highlighted or selected is updated.
+  * The `nodeFocused` event is fired whenever a node gains focus or the currently focused node is updated
   *
-  * @event vizceral-node-updated
-  * @property {object} node - The node object that has been highlighted/selected.
+  * @event nodeFocused
+  * @property {object} node - The node object that has been focused, or the focused node that has been updated.
   */
   /**
   * The `vizceral-region-context-size-changed` event is fired whenever the size of a region context panel is changed
   *
   * @event vizceral-region-context-size-changed
   * @property {object} dimensions - The dimensions of the regional context panel in which to inject context
+  */
+  /**
+  * The `vizceral-matches-found` event is fired whenever a searchString is provided
+  *
+  * @event vizceral-matches-found
+  * @property {object} match counts - { total: number, visible: number}
   */
   /**
   * The `attached` event is fired when the element is attached to the DOM.
@@ -136,8 +142,8 @@ class VizceralComponent {
       this._vizceral.updateStyles(customStyles);
 
       // Add event handlers for vizceral Events
-      this._vizceral.on('viewChanged', view => {
-        this.fire('vizceral-view-changed', { view: view });
+      this._vizceral.on('viewChanged', data => {
+        this.fire('vizceral-view-changed', { view: data.view, graph: data.graph });
       });
 
       this._vizceral.on('nodeHighlighted', node => {
@@ -148,8 +154,8 @@ class VizceralComponent {
         this.fire('vizceral-rendered', data);
       });
 
-      this._vizceral.on('nodeUpdated', node => {
-        this.fire('vizceral-node-updated', { node: node });
+      this._vizceral.on('nodeFocused', node => {
+        this.fire('vizceral-node-focused', { node: node });
       });
 
       this._vizceral.on('regionContextSizeChanged', dimensions => {
@@ -207,7 +213,7 @@ class VizceralComponent {
    * this is a noop.
    */
   clearHighlight () {
-    this._vizceral.clearHighlightedNode();
+    this._vizceral.setHighlightedNode(undefined);
   }
 
   /**
