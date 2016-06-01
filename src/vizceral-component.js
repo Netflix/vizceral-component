@@ -124,7 +124,7 @@ class VizceralComponent {
 
     // Create the vizceral view
     if (!this._vizceral) {
-      this._vizceral = new Vizceral(this.clientWidth, this.clientHeight);
+      this._vizceral = new Vizceral();
 
       // Update styles based on any passed in custom styles
       const styleNames = this._vizceral.getStyles();
