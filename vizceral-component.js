@@ -193,7 +193,7 @@
 
 	      // Create the vizceral view
 	      if (!this._vizceral) {
-	        this._vizceral = new _vizceral2.default(this.clientWidth, this.clientHeight);
+	        this._vizceral = new _vizceral2.default();
 
 	        // Update styles based on any passed in custom styles
 	        var styleNames = this._vizceral.getStyles();
@@ -533,7 +533,7 @@
 		* The `nodeHighlighted` event is fired whenever a node is highlighted.
 		*
 		* @event nodeHighlighted
-		* @property {object} node - The node object that has been highlighted/selected.
+		* @property {object} node - The node object that has been highlighted, or the highlighted node that has been updated.
 		*/
 		/**
 		* The `rendered` event is fired whenever a graph is rendered.
@@ -549,16 +549,22 @@
 		* @property {array} view - The currently selected view (e.g. [] for global, ['us-east-1'] for regional, ['us-east-1', 'api'] for node level)
 		*/
 		/**
-		* The `nodeUpdated` event is fired whenever a node that is highlighted or selected is updated.
+		* The `nodeFocused` event is fired whenever a node gains focus or the currently focused node is updated
 		*
-		* @event nodeUpdated
-		* @property {object} node - The node object that has been highlighted/selected.
+		* @event nodeFocused
+		* @property {object} node - The node object that has been focused, or the focused node that has been updated.
 		*/
 		/**
 		* The `regionContextSizeChanged` event is fired whenever the context panel size for regional context changes
 		*
 		* @event regionContextSizeChanged
 		* @property {object} dimensions - The dimensions of the region context panels
+		*/
+		/**
+		* The `matchesFound` event is fired whenever nodes are found via findNodes().
+		*
+		* @event matchesFound
+		* @property {object} matches - The matches object { total, visible }
 		*/
 
 		// These are a static size and ratio for graph placement.  The element itself can resize.
@@ -570,15 +576,25 @@
 		var Vizceral = function (_EventEmitter) {
 		  _inherits(Vizceral, _EventEmitter);
 
-		  function Vizceral(width, height) {
-		    _classCallCheck(this, Vizceral);
+		  /**
+		   * Represents a Vizceral component.
+		   * @constructor
+		   * @param {object} [canvas] - The canvas to render the graph onto; if not provided, will create a canvas accessible by this.renderer.domElement
+		   */
 
-		    // Initial three.js setup
+		  function Vizceral(canvas) {
+		    _classCallCheck(this, Vizceral);
 
 		    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Vizceral).call(this));
 
+		    var parameters = { alpha: true, antialias: true };
+		    if (canvas) {
+		      parameters.canvas = canvas;
+		    }
+
+		    // Initial three.js setup
 		    _this.scene = new _three2.default.Scene();
-		    _this.renderer = new _three2.default.WebGLRenderer({ alpha: true, antialias: true });
+		    _this.renderer = new _three2.default.WebGLRenderer(parameters);
 		    _this.renderer.autoClear = false;
 		    _this.renderer.setClearColor(0x2d2d2d, 1);
 		    _this.renderer.domElement.style.width = '100%';
@@ -586,7 +602,7 @@
 		    _this.geometry = new _three2.default.Geometry();
 
 		    // Camera
-		    _this.camera = new _three2.default.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 60000);
+		    _this.camera = new _three2.default.OrthographicCamera(0, 0, 0, 0, 1, 60000);
 		    _this.cameraTarget = new _three2.default.Vector3(0, 0, 0);
 		    _this.camera.position.set(0, 0, 600);
 		    _this.camera.lookAt(_this.cameraTarget);
@@ -597,7 +613,7 @@
 
 		    // Update the size of the renderer and the camera perspective
 		    // this.renderer.setSize(width, height);
-		    _this.setSize(width, height);
+		    _this.setSize(0, 0);
 
 		    // Setup lighting
 		    _this.scene.add(new _three2.default.AmbientLight(0xffffff));
@@ -675,8 +691,8 @@
 		      graph.on('nodeHighlighted', function (node) {
 		        return _this2.emit('nodeHighlighted', node);
 		      });
-		      graph.on('nodeUpdated', function (node) {
-		        return _this2.emit('nodeUpdated', node);
+		      graph.on('nodeFocused', function (node) {
+		        return _this2.emit('nodeFocused', node);
 		      });
 		      graph.on('setView', function (view) {
 		        return _this2.setView(view);
@@ -718,38 +734,43 @@
 		    value: function updateData(trafficData, excludedEdgeNodes) {
 		      var _this4 = this;
 
-		      if (trafficData) {
-		        if (trafficData.regions) {
-		          _lodash2.default.each(trafficData.regions, function (regionData, region) {
-		            if (_this4.graphs.regions[region] === undefined) {
-		              _this4.graphs.regions[region] = new _regionTrafficGraph2.default(region, _this4, graphWidth, graphHeight);
-		              _this4._attachGraphHandlers(_this4.graphs.regions[region]);
-		              _this4.graphs.regions[region].setFilters(_this4.filters);
-		              _this4.graphs.regions[region].showLabels(_this4.options.showLabels);
-		            }
-		            _this4.graphs.regions[region].setState(regionData);
-		          });
-		          // Update the edge graph with appropriate edge data
-		          this.graphs.global.updateData(trafficData.regions, excludedEdgeNodes);
-
-		          // Now that the initial data is loaded, check if we can set the initial node
-		          var nodeArray = this.checkInitialNode();
-		          if (nodeArray) {
-		            this.setView(nodeArray);
+		      if (trafficData && trafficData.regions) {
+		        var newGraphs = false;
+		        _lodash2.default.each(trafficData.regions, function (regionData, region) {
+		          if (_this4.graphs.regions[region] === undefined) {
+		            newGraphs = true;
+		            _this4.graphs.regions[region] = new _regionTrafficGraph2.default(region, _this4, graphWidth, graphHeight);
+		            _this4._attachGraphHandlers(_this4.graphs.regions[region]);
+		            _this4.graphs.regions[region].setFilters(_this4.filters);
+		            _this4.graphs.regions[region].showLabels(_this4.options.showLabels);
 		          }
+		          _this4.graphs.regions[region].setState(regionData);
+		        });
+		        // Update the edge graph with appropriate edge data
+		        this.graphs.global.updateData(trafficData.regions, excludedEdgeNodes);
+
+		        // Now that the initial data is loaded, check if we can set the initial node
+		        var nodeArray = this.checkInitialNode();
+		        if (nodeArray) {
+		          this.setView(nodeArray);
+		        }
+
+		        if (newGraphs) {
+		          this.emit('graphsUpdated', this.graphs);
 		        }
 		      }
 		    }
 
 		    /**
-		     * Clears the highlighted node, if there is one.  If a node is not highlighted,
-		     * this is a noop.
+		     * Sets the highlighted node.  If the node is undefined, clears any highlighting.
+		     *
+		     * @param {object} node - The node to highlight
 		     */
 
 		  }, {
-		    key: 'clearHighlightedNode',
-		    value: function clearHighlightedNode() {
-		      this.currentGraph.highlightNode(undefined);
+		    key: 'setHighlightedNode',
+		    value: function setHighlightedNode(node) {
+		      this.currentGraph.highlightNode(node);
 		    }
 
 		    /**
@@ -757,13 +778,22 @@
 		     * of clusters, if nodes have one.
 		     *
 		     * @param {string} searchString - The string to match against the nodes.
+		     *
+		     * @returns {object} - { total, totalMatches, visible, visibleMatches }
 		     */
 
 		  }, {
 		    key: 'findNodes',
 		    value: function findNodes(searchString) {
 		      this.disableHoverInteractions = !!searchString;
-		      return this.currentGraph.highlightMatchedNodes(searchString);
+		      var matchesFound = this.currentGraph.highlightMatchedNodes(searchString);
+		      if (this.currentGraph) {
+		        matchesFound.total = this.currentGraph.nodeCounts.total;
+		        matchesFound.visible = this.currentGraph.nodeCounts.visible;
+		      }
+
+		      this.emit('matchesFound', matchesFound);
+		      return matchesFound;
 		    }
 		  }, {
 		    key: 'calculateIntersectedObject',
@@ -905,7 +935,7 @@
 		        }
 		        this.currentView = currentView;
 		        this.calculateMouseOver();
-		        this.emit('viewChanged', this.currentView);
+		        this.emit('viewChanged', { view: this.currentView, graph: this.currentGraph });
 		      }
 		    }
 		  }, {
@@ -935,7 +965,7 @@
 		        var currentViewLength = this.currentView ? this.currentView.length : 0;
 
 		        if (this.currentGraph && this.currentGraph.highlightedNode) {
-		          this.clearHighlightedNode();
+		          this.setHighlightedNode(undefined);
 		        } else if (currentViewLength > 0) {
 		          this.currentView = this.currentView.slice(0, -1);
 		          this.setView(this.currentView);
@@ -987,7 +1017,7 @@
 		      parametersTo.toGraphOpacity = 1;
 
 		      // clear any highlighting on current graph
-		      this.clearHighlightedNode();
+		      this.setHighlightedNode(undefined);
 
 		      // Remove the current graph
 		      this.currentGraph.setCurrent(false);
@@ -1151,7 +1181,7 @@
 		      _tween2.default.update();
 
 		      // Check size
-		      if (this.width !== this.renderer.domElement.offsetWidth || this.height !== this.renderer.domElement.offsetHeight) {
+		      if (this.renderer.domElement.offsetWidth !== 0 && this.width !== this.renderer.domElement.offsetWidth || this.renderer.domElement.offsetHeight !== 0 && this.height !== this.renderer.domElement.offsetHeight) {
 		        this.setSize(this.renderer.domElement.offsetWidth, this.renderer.domElement.offsetHeight);
 		      }
 
@@ -69742,6 +69772,7 @@
 		        if (current) {
 		          this.loadedOnce = true;
 		          this.updateView();
+		          this.emitNodeUpdated();
 		        } else {
 		          _lodash2.default.each(this.connections, function (connection) {
 		            return connection.cleanup();
@@ -70010,12 +70041,14 @@
 		          }
 		        })();
 		      }
-
+		      this.emitNodeUpdated();
+		    }
+		  }, {
+		    key: 'emitNodeUpdated',
+		    value: function emitNodeUpdated() {
 		      if (this.highlightedNode) {
-		        // TODO: Only emit nodeUpdated if the highlighted node was actually updated
-		        this.emit('nodeUpdated', this.highlightedNode);
+		        this.emit('nodeHighlighted', this.highlightedNode);
 		      } else if (this.getSelectedNode && this.getSelectedNode()) {
-		        // TODO: Only emit nodeUpdated if the selected node was actually updated
 		        this.emit('nodeUpdated', this.getSelectedNode());
 		      }
 		    }
@@ -70696,13 +70729,13 @@
 		      if (changed) {
 		        // Remove the mouseover effect
 		        this.setIntersectedObject(undefined);
+		        this.highlightNode(undefined);
 
 		        // If there was a node selected...
 		        if (this.nodeName) {
 		          // make sure to reset the node view
 		          this.view.removeObject(this.nodes[this.nodeName]);
 		          this.nodes[this.nodeName].showDetailedView(false);
-		          this.highlightNode(undefined);
 		        }
 
 		        this.nodeName = nodeName;
@@ -70712,6 +70745,9 @@
 		          // switch to the detailed node view
 		          this.view.removeObject(this.nodes[this.nodeName]);
 		          this.nodes[this.nodeName].showDetailedView(true);
+		          this.emit('nodeFocused', this.nodes[this.nodeName]);
+		        } else {
+		          this.emit('nodeFocused', undefined);
 		        }
 
 		        this.updateVisibleInfo();
