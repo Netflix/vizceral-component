@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/Netflix/vizceral/master/logo.png)
+
 # vizceral-component
 
 vizceral-component is a web component that wraps [vizceral](https://github.com/Netflix/vizceral) for displaying traffic data on a webgl canvas. If a graph of nodes and edges with data about traffic volume is provided, it will render a traffic graph animating the connection volume between nodes.
