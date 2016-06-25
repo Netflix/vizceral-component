@@ -19,6 +19,13 @@
 /* eslint-disable no-underscore-dangle */
 import Vizceral from 'vizceral';
 
+function cleanUpColorString (colorString) {
+  // HACK Remove strange \3 and space from some hex codes
+  if (colorString.match(/^#\\3\d /)) {
+    colorString = colorString.replace(/(\\3| )/g, '');
+  }
+}
+
 class VizceralComponent {
   // Element Behavior
   /**
@@ -35,10 +42,10 @@ class VizceralComponent {
   * @property (boolean} rendered - true only if the graph has been rendered AND has position data
   */
   /**
-  * The `vizceral-view-changed` event is fired whenever the view changes between global, regional, and node
+  * The `vizceral-view-changed` event is fired whenever the view changes
   *
   * @event vizceral-view-changed
-  * @property {array} view - The currently selected view (e.g. [] for global, ['us-east-1'] for regional, ['us-east-1', 'api'] for node level)
+  * @property {array} view - The currently selected view (e.g. [] for top level graph, ['us-east-1'] for second level graph, ['us-east-1', 'api'] for node level)
   */
   /**
   * The `nodeFocused` event is fired whenever a node gains focus or the currently focused node is updated
@@ -47,10 +54,10 @@ class VizceralComponent {
   * @property {object} node - The node object that has been focused, or the focused node that has been updated.
   */
   /**
-  * The `vizceral-region-context-size-changed` event is fired whenever the size of a region context panel is changed
+  * The `vizceral-node-context-size-changed` event is fired whenever the size of a node context panel is changed
   *
-  * @event vizceral-region-context-size-changed
-  * @property {object} dimensions - The dimensions of the regional context panel in which to inject context
+  * @event vizceral-node-context-size-changed
+  * @property {object} dimensions - The dimensions of the node context panel in which to inject context
   */
   /**
   * The `vizceral-matches-found` event is fired whenever a searchString is provided
@@ -70,16 +77,6 @@ class VizceralComponent {
     this.properties = {
 
       /**
-      * `regions` Which regions to pre-load in a csv
-      */
-      regions: {
-        type: String,
-        value: '',
-        observer: '_regionsChanged',
-        reflectToAttribute: true
-      },
-
-      /**
       * `show-labels` Whether to show node labels or not
       */
       showLabels: {
@@ -89,10 +86,10 @@ class VizceralComponent {
       },
 
       /**
-      * `view` Selected view (global, region, node)
+      * `view` Selected view
       * Examples:
       *   [] - global view
-      *   ["us-west-2"] - region view for us-west-2
+      *   ["us-west-2"] - node view for us-west-2
       *   ['us-west-2', 'api-prod'] - node view for api-prod in us-west-2
       */
       view: {
@@ -100,6 +97,16 @@ class VizceralComponent {
         value: [],
         observer: 'setView',
         reflectToAttribute: true
+      },
+
+      /**
+      * `customTrafficColorClasses` Any custom traffic color classes that are going to be used for coloring
+      *  Unfortunately, this is needed because of the need to know which css variables exist to access them in javascript
+      *  Changes to this property after initial load are not watched; only the initial value is used.
+      */
+      customTrafficColorClasses: {
+        type: Array,
+        value: []
       }
     };
   }
@@ -126,19 +133,33 @@ class VizceralComponent {
     if (!this._vizceral) {
       this._vizceral = new Vizceral();
 
+
       // Update styles based on any passed in custom styles
       const styleNames = this._vizceral.getStyles();
+
       const customStyles = styleNames.reduce((result, styleName) => {
         let passedInStyle = this.getComputedStyleValue(`--${styleName}`).trim();
         if (passedInStyle) {
-          // HACK Remove strange \3 and space from some hex codes
-          if (passedInStyle.match(/^#\\3\d /)) {
-            passedInStyle = passedInStyle.replace(/(\\3| )/g, '');
-          }
+          passedInStyle = cleanUpColorString(passedInStyle);
           result[styleName] = passedInStyle;
         }
         return result;
       }, {});
+
+      // Use custom styles
+      this.customTrafficColorClasses = this.customTrafficColorClasses ||  [];
+      Array.prototype.push.apply(this.customTrafficColorClasses, ['normal', 'warning', 'danger']);
+      if (this.customTrafficColorClasses) {
+        this.customTrafficColorClasses.forEach(customClass => {
+          let value = this.getComputedStyleValue(`--colorTraffic${customClass.charAt(0).toUpperCase() + customClass.slice(1)}`).trim();
+          if (value) {
+            value = cleanUpColorString(value);
+            customStyles.colorTraffic = customStyles.colorTraffic || {};
+            customStyles.colorTraffic[customClass] = value;
+          }
+        });
+      }
+
       this._vizceral.updateStyles(customStyles);
 
       // Add event handlers for vizceral Events
@@ -158,13 +179,9 @@ class VizceralComponent {
         this.fire('vizceral-node-focused', { node: node });
       });
 
-      this._vizceral.on('regionContextSizeChanged', dimensions => {
-        this.fire('vizceral-region-context-size-changed', { dimensions: dimensions });
+      this._vizceral.on('nodeContextSizeChanged', dimensions => {
+        this.fire('vizceral-node-context-size-changed', { dimensions: dimensions });
       });
-
-      // Set up default region list
-      const regions = this.regions.length > 0 ? this.regions.split(',') : [];
-      this._vizceral.updateRegions(regions);
 
       this._vizceral.animate(); // TODO: Should we cancel the animation on detached?
     }
@@ -182,7 +199,7 @@ class VizceralComponent {
   }
 
   /**
-   * If zoomed into a region or a service, zoom out one level up.
+   * If zoomed into a node or a service, zoom out one level up.
    * If in the global view, this is a noop.
    */
   zoomOutViewLevel () {
@@ -191,14 +208,14 @@ class VizceralComponent {
 
   /**
    * Set the current view of the component to the passed in array. If the passed
-   * in array does not match an existing region or node, the component will try
+   * in array does not match an existing node, the component will try
    * each level up the array until it finds a match, defaulting to the global
    * view.
    *
    * Ex:
    * [] - show the base global view
-   * ['us-east-1'] - show the regional view for 'us-east-1' if it exists
-   * ['us-east-1', 'api'] - show the api node in the us-east-1 region if it exists
+   * ['us-east-1'] - show the view for 'us-east-1' if it exists
+   * ['us-east-1', 'api'] - show the api node in the us-east-1 graph if it exists
    *
    * @param {array} viewArray - the array containing the view to set.
    */
@@ -231,11 +248,9 @@ class VizceralComponent {
    * with the complete set of traffic data anytime there is an update.
    *
    * @param {object} data - The traffic data that matches the format in DATAFORMATS.md
-   * @param {array} excludedEdgeNodes - An array of node names that are at the edge that you want excluded from the global totals
    */
-  updateData (data, excludedEdgeNodes) {
-    this._vizceral.updateData(data, excludedEdgeNodes);
-    this.regions = Object.keys(this._vizceral.graphs.regions).join();
+  updateData (data) {
+    this._vizceral.updateData(data);
   }
 
   /**
@@ -250,7 +265,7 @@ class VizceralComponent {
   /**
    * Get a specific node object
    *
-   * @param {array} nodeArray - e.g. [ region, nodeName ]
+   * @param {array} nodeArray - e.g. [ node, node ]
    */
   getNode (nodeArray) {
     return this._vizceral.getNode(nodeArray);
@@ -264,23 +279,13 @@ class VizceralComponent {
   }
 
   /**
-   * Get all the graphs, global and regional
+   * Get all the graphs
    */
   getGraphs () {
     return this._vizceral.graphs;
   }
 
   // Element Behavior
-
-  /**
-  * fires when @regions is changed
-  */
-  _regionsChanged (regions) {
-    if (this._vizceral) {
-      regions = regions.length > 0 ? regions.split(',') : [];
-      this._vizceral.updateRegions(regions);
-    }
-  }
 
   /**
   * fires when @show-labels is changed
