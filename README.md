@@ -11,7 +11,7 @@ This component can take multiple traffic graphs and will generate a 'global' gra
 
    ```js
    "dependencies": {
-     "vizceral-component": "git+ssh://git@stash.corp.netflix.com:7999/traffic/vizceral-component.git#master",
+     "vizceral-component": "git+ssh://git@github.com:Netflix/vizceral-component.git#master",
      "webcomponentsjs": "^0.7.21"
    }
    ```

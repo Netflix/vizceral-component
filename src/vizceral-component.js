@@ -89,7 +89,7 @@ class VizceralComponent {
       * `view` Selected view
       * Examples:
       *   [] - global view
-      *   ["us-west-2"] - node view for us-west-2
+      *   ['us-west-2'] - node view for us-west-2
       *   ['us-west-2', 'api-prod'] - node view for api-prod in us-west-2
       */
       view: {
@@ -132,6 +132,7 @@ class VizceralComponent {
     // Create the vizceral view
     if (!this._vizceral) {
       this._vizceral = new Vizceral();
+      if (this.view) { this.setView(this.view); }
 
 
       // Update styles based on any passed in custom styles
@@ -220,6 +221,7 @@ class VizceralComponent {
    * @param {array} viewArray - the array containing the view to set.
    */
   setView (viewArray) {
+    this.view = viewArray;
     if (this._vizceral) {
       this._vizceral.setView(viewArray);
     }
@@ -260,6 +262,24 @@ class VizceralComponent {
    */
   setFilters (filters) {
     this._vizceral.setFilters(filters);
+  }
+
+  /**
+   * Update the mode definitions. Refer to github.com/Netflix/vizceral/DATAFORMATS.md#definitions
+   *
+   * @param {object} definitions - Object map of definitions
+   */
+  setDefinitions (definitions) {
+    this._vizceral.updateDefinitions(definitions);
+  }
+
+  /**
+   * Set the lost of modes to apply along with their current values.
+   *
+   * @param {object} modes - Map of modes to mode type, e.g. { detailedNode: 'volume' }
+   */
+  setModes (modes) {
+    this._vizceral.setModes(modes);
   }
 
   /**
