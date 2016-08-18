@@ -148,7 +148,7 @@ class VizceralComponent {
       }, {});
 
       // Use custom styles
-      this.customTrafficColorClasses = this.customTrafficColorClasses ||  [];
+      this.customTrafficColorClasses = this.customTrafficColorClasses || [];
       Array.prototype.push.apply(this.customTrafficColorClasses, ['normal', 'warning', 'danger']);
       if (this.customTrafficColorClasses) {
         this.customTrafficColorClasses.forEach(customClass => {
@@ -165,7 +165,7 @@ class VizceralComponent {
 
       // Add event handlers for vizceral Events
       this._vizceral.on('viewChanged', data => {
-        this.fire('vizceral-view-changed', { view: data.view, graph: data.graph });
+        this.fire('vizceral-view-changed', { view: data.view, graph: data.graph, redirectedFrom: data.redirectedFrom });
       });
 
       this._vizceral.on('nodeHighlighted', node => {
@@ -219,11 +219,12 @@ class VizceralComponent {
    * ['us-east-1', 'api'] - show the api node in the us-east-1 graph if it exists
    *
    * @param {array} viewArray - the array containing the view to set.
+   * @param {string} nodeToHighlight - a node to highlight in the passed in view.
    */
-  setView (viewArray) {
+  setView (viewArray, highlightedNode) {
     this.view = viewArray;
     if (this._vizceral) {
-      this._vizceral.setView(viewArray);
+      this._vizceral.setView(viewArray, highlightedNode);
     }
   }
 
