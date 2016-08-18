@@ -96,16 +96,17 @@
       "setView": {
         "name": "setView",
         "params": [
-          "viewArray"
+          "viewArray",
+          "highlightedNode"
         ],
-        "comments": "Set the current view of the component to the passed in array. If the passed\nin array does not match an existing node, the component will try\neach level up the array until it finds a match, defaulting to the global\nview.\n\nEx:\n[] - show the base global view\n['us-east-1'] - show the view for 'us-east-1' if it exists\n['us-east-1', 'api'] - show the api node in the us-east-1 graph if it exists\n\n@param {array} viewArray - the array containing the view to set.",
-        "loc": 223
+        "comments": "Set the current view of the component to the passed in array. If the passed\nin array does not match an existing node, the component will try\neach level up the array until it finds a match, defaulting to the global\nview.\n\nEx:\n[] - show the base global view\n['us-east-1'] - show the view for 'us-east-1' if it exists\n['us-east-1', 'api'] - show the api node in the us-east-1 graph if it exists\n\n@param {array} viewArray - the array containing the view to set.\n@param {string} nodeToHighlight - a node to highlight in the passed in view.",
+        "loc": 224
       },
       "clearHighlight": {
         "name": "clearHighlight",
         "params": [],
         "comments": "Clears the highlighted node, if there is one.  If a node is not highlighted,\nthis is a noop.",
-        "loc": 234
+        "loc": 235
       },
       "findNodes": {
         "name": "findNodes",
@@ -113,7 +114,7 @@
           "searchString"
         ],
         "comments": "Highlight nodes that match searchString.  Searches the node name and the list\nof clusters, if nodes have one.\n\n@param {string} searchString - The string to match against the nodes.",
-        "loc": 244
+        "loc": 245
       },
       "updateData": {
         "name": "updateData",
@@ -121,7 +122,7 @@
           "data"
         ],
         "comments": "Set the new set of traffic data to render. This is expected to be called\nwith the complete set of traffic data anytime there is an update.\n\n@param {object} data - The traffic data that matches the format in DATAFORMATS.md",
-        "loc": 254
+        "loc": 255
       },
       "setFilters": {
         "name": "setFilters",
@@ -129,7 +130,7 @@
           "filters"
         ],
         "comments": "Set the set of filters to apply along with their current values.\n\n@param {object} filters - The filters that match the format in DATAFORMATS.md",
-        "loc": 263
+        "loc": 264
       },
       "setDefinitions": {
         "name": "setDefinitions",
@@ -137,7 +138,7 @@
           "definitions"
         ],
         "comments": "Update the mode definitions. Refer to github.com/Netflix/vizceral/DATAFORMATS.md#definitions\n\n@param {object} definitions - Object map of definitions",
-        "loc": 272
+        "loc": 273
       },
       "setModes": {
         "name": "setModes",
@@ -145,7 +146,7 @@
           "modes"
         ],
         "comments": "Set the lost of modes to apply along with their current values.\n\n@param {object} modes - Map of modes to mode type, e.g. { detailedNode: 'volume' }",
-        "loc": 281
+        "loc": 282
       },
       "getNode": {
         "name": "getNode",
@@ -153,19 +154,19 @@
           "nodeArray"
         ],
         "comments": "Get a specific node object\n\n@param {array} nodeArray - e.g. [ node, node ]",
-        "loc": 290
+        "loc": 291
       },
       "getCurrentGraph": {
         "name": "getCurrentGraph",
         "params": [],
         "comments": "Get the currently selected graph object",
-        "loc": 297
+        "loc": 298
       },
       "getGraphs": {
         "name": "getGraphs",
         "params": [],
         "comments": "Get all the graphs",
-        "loc": 304
+        "loc": 305
       },
       "_showLabelsChanged": {
         "name": "_showLabelsChanged",
@@ -173,7 +174,7 @@
           "showLabels"
         ],
         "comments": "fires when @show-labels is changed",
-        "loc": 313
+        "loc": 314
       }
     }
   }
