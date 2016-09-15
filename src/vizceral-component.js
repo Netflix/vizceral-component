@@ -95,7 +95,7 @@ class VizceralComponent {
       view: {
         type: Array,
         value: [],
-        observer: 'setView',
+        observer: '_viewChanged',
         reflectToAttribute: true
       },
 
@@ -109,6 +109,10 @@ class VizceralComponent {
         value: []
       }
     };
+
+    this.observers = [
+      '_viewChanged(view.*)'
+    ];
   }
 
   // Element Lifecycle
@@ -226,6 +230,10 @@ class VizceralComponent {
     if (this._vizceral) {
       this._vizceral.setView(viewArray, highlightedNode);
     }
+  }
+
+  _viewChanged() {
+    this.setView(this.view);
   }
 
   /**
