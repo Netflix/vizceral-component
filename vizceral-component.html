@@ -26,7 +26,14 @@ Example:
           height: 100%;
         }
 
-        .connection-notice {
+        .vizceral-notice-container {
+          position: absolute;
+          width:100%;
+          height: 100%;
+          pointer-events: none;
+        }
+
+        .vizceral-notice {
           display: block;
           position: absolute;
           padding: 0 3px;
@@ -37,25 +44,28 @@ Example:
 
           font-size: 11px;
           color: grey;
+          pointer-events: all;
         }
 
-        .connection-notice ul {
+        .vizceral-notice ul {
           list-style: none;
           padding: 0;
           margin: 0;
         }
 
-        .connection-notice > ul > li {
+        .vizceral-notice > ul > li {
           line-height: 12px;
           padding-top: 3px;
           padding-bottom: 3px;
         }
 
-        .connection-notice .subtitle {
+        .vizceral-notice .subtitle {
           font-weight: 900;
         }
     </style>
-    <div class="vizceral-notice"></div>
+    <div class="vizceral-notice-container">
+      <div class="vizceral-notice"></div>
+    </div>
   </template>
 </dom-module>
 
