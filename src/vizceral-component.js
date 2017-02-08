@@ -35,11 +35,9 @@ class VizceralComponent {
   * @property {object} node - The node object that has been highlighted/selected.
   */
   /**
-  * The `vizceral-rendered` event is fired whenever a graph is rendered.
+  * The `vizceral-view-updated` event is fired whenever the current displayed graph's view updates.
   *
-  * @event vizceral-rendered
-  * @property {string} name - the name of the graph that was rendered
-  * @property (boolean} rendered - true only if the graph has been rendered AND has position data
+  * @event vizceral-view-updated
   */
   /**
   * The `vizceral-view-changed` event is fired whenever the view changes
@@ -176,8 +174,8 @@ class VizceralComponent {
         this.fire('vizceral-node-highlighted', { node: node });
       });
 
-      this._vizceral.on('rendered', data => {
-        this.fire('vizceral-rendered', data);
+      this._vizceral.on('viewUpdated', data => {
+        this.fire('vizceral-view-updated', data);
       });
 
       this._vizceral.on('nodeFocused', node => {

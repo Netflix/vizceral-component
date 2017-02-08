@@ -9,19 +9,19 @@
         "type": "Boolean",
         "value": true,
         "observer": "_showLabelsChanged",
-        "loc": 82,
+        "loc": 80,
         "comments": "`show-labels` Whether to show node labels or not"
       },
       "view": {
         "type": "Array",
-        "observer": "setView",
+        "observer": "_viewChanged",
         "reflectToAttribute": true,
-        "loc": 95,
+        "loc": 93,
         "comments": "`view` Selected view\nExamples:\n[] - global view\n['us-west-2'] - node view for us-west-2\n['us-west-2', 'api-prod'] - node view for api-prod in us-west-2"
       },
       "customTrafficColorClasses": {
         "type": "Array",
-        "loc": 107,
+        "loc": 105,
         "comments": "`customTrafficColorClasses` Any custom traffic color classes that are going to be used for coloring\nUnfortunately, this is needed because of the need to know which css variables exist to access them in javascript\nChanges to this property after initial load are not watched; only the initial value is used."
       }
     },
@@ -29,19 +29,19 @@
       "vizceral-node-highlighted": {
         "comments": "The `vizceral-node-highlighted` event is fired whenever a node is highlighted.\n\n@event vizceral-node-highlighted\n@property {object} node - The node object that has been highlighted/selected.",
         "firedLoc": [
-          172
+          174
         ]
       },
-      "vizceral-rendered": {
-        "comments": "The `vizceral-rendered` event is fired whenever a graph is rendered.\n\n@event vizceral-rendered\n@property {string} name - the name of the graph that was rendered\n@property (boolean} rendered - true only if the graph has been rendered AND has position data",
+      "vizceral-view-updated": {
+        "comments": "The `vizceral-view-updated` event is fired whenever the current displayed graph's view updates.\n\n@event vizceral-view-updated",
         "firedLoc": [
-          176
+          178
         ]
       },
       "vizceral-view-changed": {
         "comments": "The `vizceral-view-changed` event is fired whenever the view changes\n\n@event vizceral-view-changed\n@property {array} view - The currently selected view (e.g. [] for top level graph, ['us-east-1'] for second level graph, ['us-east-1', 'api'] for node level)",
         "firedLoc": [
-          168
+          170
         ]
       },
       "nodeFocused": {
@@ -50,7 +50,7 @@
       "vizceral-node-context-size-changed": {
         "comments": "The `vizceral-node-context-size-changed` event is fired whenever the size of a node context panel is changed\n\n@event vizceral-node-context-size-changed\n@property {object} dimensions - The dimensions of the node context panel in which to inject context",
         "firedLoc": [
-          184
+          186
         ]
       },
       "vizceral-matches-found": {
@@ -59,12 +59,12 @@
       "attached": {
         "comments": "The `attached` event is fired when the element is attached to the DOM.\n\n@event attached",
         "firedLoc": [
-          192
+          194
         ]
       },
       "vizceral-node-focused": {
         "firedLoc": [
-          180
+          182
         ]
       }
     },
@@ -73,25 +73,25 @@
         "name": "ready",
         "params": [],
         "comments": "`ready` is called after all elements have been configured, but\npropagates bottom-up. This element's children are ready, but parents\nare not.\n\nThis is the point where you should make modifications to the DOM (when\nnecessary), or kick off any processes the element wants to perform.",
-        "loc": 115
+        "loc": 117
       },
       "attached": {
         "name": "attached",
         "params": [],
         "comments": "`attached` fires once the element and its parents have been inserted\ninto a document.\n\nThis is a good place to perform any work related to your element's\nvisual state or active behavior (measuring sizes, beginning animations,\nloading resources, etc).",
-        "loc": 124
+        "loc": 126
       },
       "detached": {
         "name": "detached",
         "params": [],
         "comments": "The analog to `attached`, `detached` fires when the element has been\nremoved from a document.\n\nUse this to clean up anything you did in `attached`.\nThe analog to `attached`, `detached` fires when the element has been\nremoved from a document.\n\nUse this to clean up anything you did in `attached`.",
-        "loc": 195
+        "loc": 197
       },
       "zoomOutViewLevel": {
         "name": "zoomOutViewLevel",
         "params": [],
         "comments": "If zoomed into a node or a service, zoom out one level up.\nIf in the global view, this is a noop.",
-        "loc": 206
+        "loc": 208
       },
       "setView": {
         "name": "setView",
@@ -100,13 +100,19 @@
           "highlightedNode"
         ],
         "comments": "Set the current view of the component to the passed in array. If the passed\nin array does not match an existing node, the component will try\neach level up the array until it finds a match, defaulting to the global\nview.\n\nEx:\n[] - show the base global view\n['us-east-1'] - show the view for 'us-east-1' if it exists\n['us-east-1', 'api'] - show the api node in the us-east-1 graph if it exists\n\n@param {array} viewArray - the array containing the view to set.\n@param {string} nodeToHighlight - a node to highlight in the passed in view.",
-        "loc": 224
+        "loc": 226
+      },
+      "_viewChanged": {
+        "name": "_viewChanged",
+        "params": [],
+        "comments": "",
+        "loc": 233
       },
       "clearHighlight": {
         "name": "clearHighlight",
         "params": [],
         "comments": "Clears the highlighted node, if there is one.  If a node is not highlighted,\nthis is a noop.",
-        "loc": 235
+        "loc": 241
       },
       "findNodes": {
         "name": "findNodes",
@@ -114,7 +120,7 @@
           "searchString"
         ],
         "comments": "Highlight nodes that match searchString.  Searches the node name and the list\nof clusters, if nodes have one.\n\n@param {string} searchString - The string to match against the nodes.",
-        "loc": 245
+        "loc": 251
       },
       "updateData": {
         "name": "updateData",
@@ -122,7 +128,7 @@
           "data"
         ],
         "comments": "Set the new set of traffic data to render. This is expected to be called\nwith the complete set of traffic data anytime there is an update.\n\n@param {object} data - The traffic data that matches the format in DATAFORMATS.md",
-        "loc": 255
+        "loc": 261
       },
       "setFilters": {
         "name": "setFilters",
@@ -130,7 +136,7 @@
           "filters"
         ],
         "comments": "Set the set of filters to apply along with their current values.\n\n@param {object} filters - The filters that match the format in DATAFORMATS.md",
-        "loc": 264
+        "loc": 270
       },
       "setDefinitions": {
         "name": "setDefinitions",
@@ -138,7 +144,7 @@
           "definitions"
         ],
         "comments": "Update the mode definitions. Refer to github.com/Netflix/vizceral/DATAFORMATS.md#definitions\n\n@param {object} definitions - Object map of definitions",
-        "loc": 273
+        "loc": 279
       },
       "setModes": {
         "name": "setModes",
@@ -146,7 +152,7 @@
           "modes"
         ],
         "comments": "Set the lost of modes to apply along with their current values.\n\n@param {object} modes - Map of modes to mode type, e.g. { detailedNode: 'volume' }",
-        "loc": 282
+        "loc": 288
       },
       "getNode": {
         "name": "getNode",
@@ -154,19 +160,19 @@
           "nodeArray"
         ],
         "comments": "Get a specific node object\n\n@param {array} nodeArray - e.g. [ node, node ]",
-        "loc": 291
+        "loc": 297
       },
       "getCurrentGraph": {
         "name": "getCurrentGraph",
         "params": [],
         "comments": "Get the currently selected graph object",
-        "loc": 298
+        "loc": 304
       },
       "getGraphs": {
         "name": "getGraphs",
         "params": [],
         "comments": "Get all the graphs",
-        "loc": 305
+        "loc": 311
       },
       "_showLabelsChanged": {
         "name": "_showLabelsChanged",
@@ -174,7 +180,7 @@
           "showLabels"
         ],
         "comments": "fires when @show-labels is changed",
-        "loc": 314
+        "loc": 320
       }
     }
   }
